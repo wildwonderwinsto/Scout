@@ -1,0 +1,29 @@
+services:
+  # 1. The FastAPI Backend
+  - type: web
+    name: youtube-trend-scout-api
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn -w 1 -k uvicorn.workers.UvicornWorker app.main:app"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.0
+      - key: DATABASE_URL
+        sync: false # You will paste your Supabase Postgres Connection String here
+      - key: YOUTUBE_API_KEY
+        sync: false # You will enter this manually in the Render Dashboard
+
+  # 2. The React Frontend
+  - type: static
+    name: youtube-trend-scout-ui
+    rootDir: frontend
+    buildCommand: "npm install && npm run build"
+    staticPublishPath: dist
+    envVars:
+      - key: NODE_VERSION
+        value: 18.17.0
+    # Redirect all 404s to index.html so React Router works correctly
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
