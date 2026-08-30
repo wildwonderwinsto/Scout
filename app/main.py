@@ -5,8 +5,8 @@ Initializes logging, creates database tables, and mounts all routers.
 Run with:  uvicorn app.main:app --reload
 """
 
-from fastapi import FastAPI
-from fastapi.responses import Response
+from fastapi import FastAPI, Request
+from fastapi.responses import Response, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -19,6 +19,8 @@ from app.services.snapshot_service import update_tracked_snapshots
 
 # Ensure all models are imported so Base.metadata knows about them
 from app.models import Channel, Video, VideoSnapshot  # noqa: F401
+
+from googleapiclient.errors import HttpError
 
 
 # ── Logging ───────────────────────────────────────────────────────────────
@@ -64,10 +66,22 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Tighten in production
-    allow_credentials=True,
+    allow_credentials=False, # Must be False if allow_origins is ["*"]
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.exception_handler(HttpError)
+async def youtube_api_exception_handler(request: Request, exc: HttpError):
+    if exc.resp.status == 429:
+        return JSONResponse(
+            status_code=429,
+            content={"detail": "YouTube API Quota Exceeded. Please try again tomorrow or use a different API key."},
+        )
+    return JSONResponse(
+        status_code=exc.resp.status,
+        content={"detail": f"YouTube API Error: {exc._get_reason()}"},
+    )
 
 # ── Routers ───────────────────────────────────────────────────────────────
 app.include_router(health.router)
