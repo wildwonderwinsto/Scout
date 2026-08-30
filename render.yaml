@@ -14,8 +14,9 @@ services:
         sync: false # You will enter this manually in the Render Dashboard
 
   # 2. The React Frontend
-  - type: static
+  - type: web
     name: youtube-trend-scout-ui
+    env: static
     rootDir: frontend
     buildCommand: "npm install && npm run build"
     staticPublishPath: dist
