@@ -126,7 +126,7 @@ def analyze_channel(
         engagement_rates.append(engagement)
 
     # Sort by breakout score (highest outliers first)
-    ranked_videos = _sort_results(ranked_videos, "breakout")
+    ranked_videos = _sort_results(ranked_videos, "breakout", deduplicate=False)
 
     # ── Extract outliers ──────────────────────────────────────────────
     top_outliers = [rv for rv in ranked_videos if rv.breakout_score >= outlier_threshold]

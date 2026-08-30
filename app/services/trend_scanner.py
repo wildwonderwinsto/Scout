@@ -335,7 +335,11 @@ def _build_ranked_video(
 #  SORTING
 # ══════════════════════════════════════════════════════════════════════════
 
-def _sort_results(results: List[RankedVideo], sort_by: str) -> List[RankedVideo]:
+def _sort_results(
+    results: List[RankedVideo],
+    sort_by: str = "breakout",
+    deduplicate: bool = True,
+) -> List[RankedVideo]:
     """
     Sort results by the requested metric.
 
@@ -345,6 +349,9 @@ def _sort_results(results: List[RankedVideo], sort_by: str) -> List[RankedVideo]
     - 3rd filter by published_days_ago <= 3 for velocity, <= 14 for outlier
 
     For "vph" sort, we reverse the priority.
+
+    If deduplicate is True, keep only the best video per channel.
+    Set to False for single-channel scans where you want all videos.
     """
     if sort_by == "breakout":
         # Primary: breakout desc, tiebreak: vph desc
@@ -356,8 +363,9 @@ def _sort_results(results: List[RankedVideo], sort_by: str) -> List[RankedVideo]
         results.sort(key=lambda r: r.view_count, reverse=True)
     elif sort_by == "date":
         results.sort(key=lambda r: r.published_at or datetime.min, reverse=True)
-        # Default to breakout
-        results.sort(key=lambda r: (r.breakout_score, r.vph), reverse=True)
+
+    if not deduplicate:
+        return results
 
     # Channel-level deduplication: keep only the best video per channel
     seen_channels = set()
@@ -490,7 +498,7 @@ def discover_channels_from_recent_videos(
     # Search for recent popular videos
     search_results = client.search_videos_advanced(
         query=query_to_use,
-        order="viewCount",
+        order="relevance",
         max_results=50,
         published_after=published_after,
         video_duration=video_duration,
@@ -647,7 +655,7 @@ def keyword_scan(
     # Step 1: Search for videos matching the keyword
     search_results = client.search_videos_advanced(
         query=filters.query,
-        order="viewCount",
+        order="relevance",
         max_results=50,
         published_after=published_after,
         video_duration=video_duration,
@@ -805,7 +813,7 @@ def channel_scan(
         )
         all_results.append(ranked)
 
-    all_results = _sort_results(all_results, filters.sort_by)
+    all_results = _sort_results(all_results, filters.sort_by, deduplicate=False)
     all_results = all_results[:filters.max_results]
 
     return {
