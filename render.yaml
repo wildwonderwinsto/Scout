@@ -8,7 +8,7 @@ services:
     startCommand: "gunicorn -w 1 -k uvicorn.workers.UvicornWorker app.main:app"
     envVars:
       - key: PYTHON_VERSION
-        value: 3.10.0
+        value: 3.11.12
       - key: DATABASE_URL
         sync: false # You will paste your Supabase Postgres Connection String here
       - key: YOUTUBE_API_KEY
