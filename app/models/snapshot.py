@@ -10,7 +10,7 @@ Example VPH calculation:
           hours_between(snapshot_old.captured_at, snapshot_new.captured_at)
 """
 
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, BigInteger, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database import Base
@@ -21,9 +21,9 @@ class VideoSnapshot(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     video_id = Column(String, ForeignKey("videos.id"), nullable=False, index=True)
-    view_count = Column(Integer, nullable=False)
-    like_count = Column(Integer, nullable=True)
-    comment_count = Column(Integer, nullable=True)
+    view_count = Column(BigInteger, nullable=False)
+    like_count = Column(BigInteger, nullable=True)
+    comment_count = Column(BigInteger, nullable=True)
     captured_at = Column(DateTime, server_default=func.now(), nullable=False, index=True)
 
     # ── Relationships ─────────────────────────────────────────────────────

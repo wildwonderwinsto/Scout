@@ -8,7 +8,7 @@ calculations later.
 """
 
 from typing import Optional
-from sqlalchemy import Column, String, Integer, DateTime, Boolean, Float, Text
+from sqlalchemy import Column, String, Integer, BigInteger, DateTime, Boolean, Float, Text
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database import Base
@@ -31,9 +31,9 @@ class Channel(Base):
     created_at = Column(DateTime, nullable=True)          # Channel creation date (snippet.publishedAt)
 
     # ── Statistics ────────────────────────────────────────────────────────
-    subscriber_count = Column(Integer, nullable=True)     # Public sub count (may be hidden)
-    video_count = Column(Integer, nullable=True)          # Total public videos
-    view_count = Column(Integer, nullable=True)           # Lifetime total views
+    subscriber_count = Column(BigInteger, nullable=True)     # Public sub count (may be hidden)
+    video_count = Column(BigInteger, nullable=True)          # Total public videos
+    view_count = Column(BigInteger, nullable=True)           # Lifetime total views
 
     # ── Classification ────────────────────────────────────────────────────
     topics = Column(Text, nullable=True)                  # Comma-separated topicCategory URLs

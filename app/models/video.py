@@ -7,7 +7,7 @@ more VideoSnapshots for historical VPH tracking.
 """
 
 from typing import Optional
-from sqlalchemy import Column, String, Integer, DateTime, Boolean, Float, Text, ForeignKey
+from sqlalchemy import Column, String, Integer, BigInteger, DateTime, Boolean, Float, Text, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database import Base
@@ -34,9 +34,9 @@ class Video(Base):
     is_short = Column(Boolean, nullable=True, default=False)       # True if <= 60s (Shorts)
 
     # ── Statistics ────────────────────────────────────────────────────────
-    view_count = Column(Integer, nullable=True)
-    like_count = Column(Integer, nullable=True)
-    comment_count = Column(Integer, nullable=True)
+    view_count = Column(BigInteger, nullable=True)
+    like_count = Column(BigInteger, nullable=True)
+    comment_count = Column(BigInteger, nullable=True)
 
     # ── Assets ────────────────────────────────────────────────────────────
     thumbnail_url = Column(String, nullable=True)                  # Highest-res thumbnail URL
