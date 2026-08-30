@@ -3,6 +3,7 @@ services:
   - type: web
     name: youtube-trend-scout-api
     env: python
+    plan: free
     buildCommand: "pip install -r requirements.txt"
     startCommand: "gunicorn -w 1 -k uvicorn.workers.UvicornWorker app.main:app"
     envVars:
