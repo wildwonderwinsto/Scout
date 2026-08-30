@@ -22,6 +22,7 @@ from app.services.data_fetcher import (
 )
 from app.services.trend_scanner import (
     compute_channel_avg_views,
+    compute_channel_median_views,
     compute_breakout_score,
     compute_engagement_rate,
     compute_vph_from_snapshots,
@@ -92,6 +93,8 @@ def analyze_channel(
 
     videos = fetch_and_store_channel_videos(db, channel_id, max_results=max_videos)
     channel_avg = compute_channel_avg_views(channel)
+    channel_median = compute_channel_median_views(db, channel.id)
+    baseline_views = channel_median if channel_median > 0 else channel_avg
 
     # ── Score every video ─────────────────────────────────────────────
     ranked_videos: List[RankedVideo] = []
@@ -102,7 +105,7 @@ def analyze_channel(
             continue
 
         engagement = compute_engagement_rate(video)
-        breakout = compute_breakout_score(video.view_count, channel_avg)
+        breakout = compute_breakout_score(video.view_count, baseline_views)
 
         vph = compute_vph_from_snapshots(db, video.id)
         vph_source = "snapshot" if vph > 0 else "average"
@@ -113,6 +116,7 @@ def analyze_channel(
             video=video,
             channel=channel,
             channel_avg=channel_avg,
+            channel_median=channel_median,
             vph=vph,
             vph_source=vph_source,
             engagement=engagement,
